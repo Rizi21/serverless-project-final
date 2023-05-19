@@ -4,7 +4,7 @@ provider "aws" {
 
 resource "aws_amplify_app" "example" {
   name       = "wild-rydes-app"  
-  repository = "https://git.core.and-digital.com/rizwan.farooq/serverless-project"  # Add the Git repository URL
+  repository = "https://github.com/Rizi21/serverless-project-final"  # Add the Git repository URL
 
 /*   oauth_token {
     provider_type = "GITLAB"
