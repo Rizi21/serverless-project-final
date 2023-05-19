@@ -6,9 +6,7 @@ resource "aws_amplify_app" "example" {
   name       = "wild-rydes-app"  
   repository = "https://github.com/Rizi21/serverless-project-final"  # Add the Git repository URL
 
-/*   oauth_token {
-    provider_type = "GITLAB"
-  } */
+    access_token = "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"
 }
 
 resource "aws_amplify_branch" "master" {
