@@ -1,18 +1,8 @@
 {
-  "name": "my-amplify-app",
+  "name": "serverless-project-final",
   "version": "1.0.0",
-  "description": "AWS Amplify app",
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "amplify-post-build": "amplify post-build"
-  },
-  "dependencies": {
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-scripts": "^4.0.3",
-    "@aws-amplify/cli": "^5.0.0"
-  }
+  "main": "index.js",
+  "repository": "https://github.com/Rizi21/serverless-project-final.git",
+  "author": "Rizi21 <rizwanfarooq14@hotmail.com>",
+  "license": "MIT"
 }
-
