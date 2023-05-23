@@ -42,10 +42,14 @@ output "user_pool_client_id" {
 }
 
 resource "aws_ses_email_identity" "example" {
-  email = "rizwan.farooq@and.digital"
+  email = "rizwan.farooq@andigital.com"
 }
 
 resource "aws_ses_domain_mail_from" "example" {
   domain           = aws_ses_email_identity.example.email
-  mail_from_domain = "rizwan.farooq@and.digital"
+  mail_from_domain = "bounce.${aws_ses_domain_identity.example.domain}"
+}
+
+resource "aws_ses_domain_identity" "example" {
+  domain = "andigital.com"
 }
