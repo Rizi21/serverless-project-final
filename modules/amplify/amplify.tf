@@ -19,9 +19,9 @@ resource "aws_amplify_app" "example" {
             - yarn install
         build:
           commands:
-            - yarn run build
+            - yarn run
       artifacts:
-        baseDirectory: build
+        baseDirectory: .
         files:
           - '/wild-ryde-app'
       cache:
