@@ -6,17 +6,3 @@
   "author": "Rizi21 <rizwanfarooq14@hotmail.com>",
   "license": "MIT"
 }
-
-version: 1
-frontend:
-  phases:
-    # IMPORTANT - Please verify your build commands
-    build:
-      commands: []
-  artifacts:
-    # IMPORTANT - Please verify your build output directory
-    baseDirectory: /wild-ryde-app
-    files:
-      - '**/*'
-  cache:
-    paths: []
