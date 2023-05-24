@@ -6,7 +6,4 @@
   "author": "Rizi21 <rizwanfarooq14@hotmail.com>",
   "license": "MIT"
   
-  "scripts": {
-    "build": " build index.html"
-  }
 }
