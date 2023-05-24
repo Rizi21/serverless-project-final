@@ -7,6 +7,6 @@
   "license": "MIT"
   
   "scripts": {
-    "build": " yarn build index.html"
+    "build": " build index.html"
   }
 }
