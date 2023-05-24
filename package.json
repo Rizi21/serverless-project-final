@@ -5,4 +5,8 @@
   "repository": "https://github.com/Rizi21/serverless-project-final.git",
   "author": "Rizi21 <rizwanfarooq14@hotmail.com>",
   "license": "MIT"
+  
+  "scripts": {
+    "build": "build index.html"
+  }
 }
