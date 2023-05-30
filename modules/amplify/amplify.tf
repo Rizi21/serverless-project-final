@@ -7,6 +7,12 @@ resource "aws_amplify_app" "example" {
   repository = "https://github.com/Rizi21/serverless-project-final"  # Add the Git repository URL
 
     access_token = "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"
+
+  custom_rule {
+    source = "${var.build_settings_file}"
+
+    target = "amplifyconfiguration.js"
+  }
 }
 
 resource "aws_amplify_branch" "master" {
