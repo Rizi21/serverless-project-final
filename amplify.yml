@@ -11,7 +11,7 @@ frontend:
         - yarn install
         - yarn run
         - cd ..
-        - mv build ../html-build
+        - mv html  ../html-build
         - cd ..
         - cd js
         - yarn install
