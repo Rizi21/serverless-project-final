@@ -115,27 +115,15 @@ resource "aws_lambda_function" "example_lambda" {
   function_name = "RequestUnicorn"
   handler       = "index.handler"
   runtime       = "nodejs16.x"
-  timeout       = 10
+  timeout       = 3
 
-  s3_bucket       = "wildrydes123"  # Replace with the name of your S3 bucket
-  s3_key          = "requestUnicorn.js.zip"  # Replace with the path to your .js file in the S3 bucket
+  s3_bucket       = "wildrydes123"  # Name of your S3 bucket
+  s3_key          = "requestUnicorn.js.zip"  # Path to your .js file in the S3 bucket
 
+  role          = aws_iam_role.wild_rydes_lambda_role.arn   # IAM role for the Lambda function
 
-
-  # IAM role for the Lambda function
-  role          = aws_iam_role.wild_rydes_lambda_role.arn
-
-  # The Lambda function code
-/*   filename      = "index.js"
-  source_code_hash = filebase64sha256("index.js")
-
-  environment {
-    variables = {
-      TABLE_NAME = aws_dynamodb_table.rides_table.name
-    }
-  } */
 }
-###############################################################################################################
+  
 
 ##################################### API-GATEWAY ##########################################################################
 
@@ -152,7 +140,7 @@ resource "aws_api_gateway_resource" "rideresource" {
   rest_api_id = aws_api_gateway_rest_api.wildrydes_api.id
   parent_id   = aws_api_gateway_rest_api.wildrydes_api.root_resource_id
   path_part   = "ride"
-}  # should path part be just ride? yes
+}  
 
 resource "aws_api_gateway_method" "ride_post_method" {
   rest_api_id = aws_api_gateway_rest_api.wildrydes_api.id
@@ -175,10 +163,34 @@ resource "aws_lambda_permission" "apigw_lambda" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.example_lambda.function_name
   principal     = "apigateway.amazonaws.com"
-
-  # More: http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-control-access-using-iam-policies-to-invoke-api.html
   source_arn = "arn:aws:execute-api:us-east-1:323040907683:${aws_api_gateway_rest_api.wildrydes_api.id}/*/${aws_api_gateway_method.ride_post_method.http_method}${aws_api_gateway_resource.rideresource.path}"
 }
+
+
+resource "aws_api_gateway_deployment" "deployment" {
+  rest_api_id = aws_api_gateway_rest_api.wildrydes_api.id
+
+  lifecycle {
+    create_before_destroy = true
+  }
+  depends_on = [aws_api_gateway_method.ride_post_method, aws_api_gateway_integration.lambda_integration]
+}
+
+resource "aws_api_gateway_stage" "example" {
+  deployment_id = aws_api_gateway_deployment.deployment.id
+  rest_api_id   = aws_api_gateway_rest_api.wildrydes_api.id
+  stage_name    = "prod"
+}
+
+
+# resource "aws_api_gateway_authorizer" "wildrydes_authorizer" {
+#   name                   = "WildRydes"
+#   rest_api_id            = aws_api_gateway_rest_api.example.id
+#   type                   = "COGNITO_USER_POOLS"
+#   provider_arns          = [aws_cognito_user_pool.example.arn]
+#   identity_source        = "method.request.header.Authorization"
+#   authorizer_result_ttl_seconds = 300
+# }
 
 # resource "aws_api_gateway_method_settings" "ride_method_settings" {
 #   rest_api_id = aws_api_gateway_rest_api.wildrydes_api.id
@@ -191,12 +203,24 @@ resource "aws_lambda_permission" "apigw_lambda" {
 #   }
 # }
 
-# # resource "aws_api_gateway_deployment" "wildrydes_deployment" {
-# #   depends_on    = [aws_api_gateway_method_settings.ride_method_settings]
-# #   rest_api_id   = aws_api_gateway_rest_api.wildrydes_api.id
-# #   stage_name    = "prod"
-# #   description   = "Production Deployment"
-# #   variables     = {
-# #     "environment" = "production"
-# #   }
-# # }
+
+resource "aws_api_gateway_gateway_response" "cors" {
+  rest_api_id = aws_api_gateway_rest_api.wildrydes_api.id
+  response_type = "DEFAULT_4XX"
+
+  response_parameters = {
+    "gatewayresponse.header.Access-Control-Allow-Origin" = "'*'"
+    "gatewayresponse.header.Access-Control-Allow-Methods" = "'POST,OPTIONS'"
+    "gatewayresponse.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+  }
+}
+
+resource "aws_api_gateway_method_response" "method_response" {
+  rest_api_id = aws_api_gateway_rest_api.wildrydes_api.id
+  resource_id = aws_api_gateway_resource.rideresource.id
+  http_method = aws_api_gateway_method.ride_post_method.http_method
+  status_code = "200"
+   response_models = {
+    "application/json" = "Empty"
+  }
+}
