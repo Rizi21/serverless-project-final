@@ -10,17 +10,17 @@ frontend:
         - cd html
         - yarn install
         - yarn run
-        - mv build ../../html-build
+        - mv html ../../html-build
         - cd ..
         - cd js
         - yarn install
         - yarn run
-        - mv build ../../js-build
+        - mv js ../../js-build
         - cd ..
         - cd css
         - yarn install
         - yarn run
-        - mv build ../../css-build
+        - mv css ../../css-build
   artifacts:
     baseDirectory: .
     files:
