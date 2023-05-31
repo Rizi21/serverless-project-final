@@ -1,9 +1,41 @@
 {
+  "version": "1",
   "frontend": {
-    "build": {
-      "command": "yarn build",
-      "output": "deploy"
+    "phases": {
+      "preBuild": {
+        "commands": [
+          "echo \"Pre-build commands\""
+        ]
+      },
+      "build": {
+        "commands": [
+          "cd wild-ryde-app",
+          "cd html",
+          "yarn install",
+          "yarn run build",
+          "mv build ../../html-build",
+          "cd ..",
+          "cd js",
+          "yarn install",
+          "yarn run build",
+          "mv build ../../js-build",
+          "cd ..",
+          "cd css",
+          "yarn install",
+          "yarn run build",
+          "mv build ../../css-build"
+        ]
+      }
+    },
+    "artifacts": {
+      "baseDirectory": ".",
+      "files": [
+        "html-build/**/*",
+        "js-build/**/*",
+        "css-build/**/*"
+      ]
     }
   }
 }
+
 
