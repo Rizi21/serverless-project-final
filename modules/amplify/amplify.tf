@@ -12,6 +12,13 @@ resource "aws_amplify_app" "example" {
     source = "${var.build_settings_file}"
 
     target = "amplifyconfiguration.js"
+
+  }
+
+      custom_rule {
+    source = "/wild-ryde-app/html/(.*)"
+    target = "/$1"
+
   }
 }
 
@@ -21,10 +28,6 @@ resource "aws_amplify_branch" "master" {
   enable_pull_request_preview = true
   enable_auto_build = true
 
-    custom_rule {
-    source = "/wild-ryde-app/html/(.*)"
-    target = "/$1"
-  }
 }
 
 
