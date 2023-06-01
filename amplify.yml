@@ -9,17 +9,17 @@ frontend:
         - cd wild-ryde-app
         - cd html
         - yarn install
-        - yarn run build
+        - yarn run
         - mv build ../html-build
         - cd ..
         - cd js
         - yarn install
-        - yarn run build
+        - yarn run
         - mv build ../js-build
         - cd ..
         - cd css
         - yarn install
-        - yarn run build
+        - yarn run
         - mv build ../css-build
   artifacts:
     baseDirectory: .
