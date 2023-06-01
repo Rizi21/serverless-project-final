@@ -20,6 +20,11 @@ resource "aws_amplify_branch" "master" {
   branch_name = "main"  
   enable_pull_request_preview = true
   enable_auto_build = true
+
+    rewrite {
+    source = "/wild-ryde-app/html/(.*)"
+    target = "/$1"
+  }
 }
 
 
