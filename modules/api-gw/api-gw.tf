@@ -1,6 +1,8 @@
 provider "aws" {
   region = "us-east-1"  
 }
+
+
 ################################ Lambda Function & IAM ROLES  ##########################################################################
 resource "aws_iam_role" "wild_rydes_lambda_role" {
   name               = "WildRydesLambda"
@@ -118,14 +120,18 @@ resource "aws_lambda_function" "example_lambda" {
   timeout       = 3
 
   s3_bucket       = "wildrydes123"  # Name of your S3 bucket
-  s3_key          = "requestUnicorn.js.zip"  # Path to your .js file in the S3 bucket
+  s3_key          = "index.js.zip"  # Path to your .js file in the S3 bucket
 
   role          = aws_iam_role.wild_rydes_lambda_role.arn   # IAM role for the Lambda function
 
 }
   
 
-##################################### API-GATEWAY ##########################################################################
+#################################### API-GATEWAY ##########################################################################
+# data "aws_cognito_user_pools" "cognito_pool" {
+#   name = WildRydes
+# }
+
 
 resource "aws_api_gateway_rest_api" "wildrydes_api" {
   name        = "WildRydes"
@@ -146,8 +152,14 @@ resource "aws_api_gateway_method" "ride_post_method" {
   rest_api_id = aws_api_gateway_rest_api.wildrydes_api.id
   resource_id = aws_api_gateway_resource.rideresource.id
   http_method = "POST"
-  authorization = "NONE"
-}
+  authorization = "COGNITO_USER_POOLS"
+  authorizer_id = aws_api_gateway_authorizer.wildrydes_authorizer.id
+#     request_parameters = {
+#     "method.request.path.proxy" = true
+#   }
+ }
+
+
 
 resource "aws_api_gateway_integration" "lambda_integration" {
   rest_api_id             = aws_api_gateway_rest_api.wildrydes_api.id
@@ -183,44 +195,75 @@ resource "aws_api_gateway_stage" "example" {
 }
 
 
-# resource "aws_api_gateway_authorizer" "wildrydes_authorizer" {
-#   name                   = "WildRydes"
-#   rest_api_id            = aws_api_gateway_rest_api.example.id
-#   type                   = "COGNITO_USER_POOLS"
-#   provider_arns          = [aws_cognito_user_pool.example.arn]
-#   identity_source        = "method.request.header.Authorization"
-#   authorizer_result_ttl_seconds = 300
-# }
-
-# resource "aws_api_gateway_method_settings" "ride_method_settings" {
-#   rest_api_id = aws_api_gateway_rest_api.wildrydes_api.id
-#   stage_name  = "prod"
-#   method_path = aws_api_gateway_resource.ride_resource.path_part
-
-#   settings {
-#     authorization_type = "COGNITO_USER_POOLS"
-#     authorizer_id      = aws_api_gateway_authorizer.wildrydes_authorizer.id
-#   }
-# }
-
-
-resource "aws_api_gateway_gateway_response" "cors" {
-  rest_api_id = aws_api_gateway_rest_api.wildrydes_api.id
-  response_type = "DEFAULT_4XX"
-
-  response_parameters = {
-    "gatewayresponse.header.Access-Control-Allow-Origin" = "'*'"
-    "gatewayresponse.header.Access-Control-Allow-Methods" = "'POST,OPTIONS'"
-    "gatewayresponse.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-  }
+resource "aws_api_gateway_authorizer" "wildrydes_authorizer" {
+  name                            = "WildRydes"
+  rest_api_id                     = aws_api_gateway_rest_api.wildrydes_api.id
+  type                            = "COGNITO_USER_POOLS"
+  provider_arns                   = ["arn:aws:cognito-idp:us-east-1:323040907683:userpool/us-east-1_lWP0a8Vof"]   # or data.aws_cognito_user_pools.this.arns
+  identity_source                 = "method.request.header.Authorization"
 }
 
-resource "aws_api_gateway_method_response" "method_response" {
+
+resource "aws_api_gateway_method_response" "cors" {
   rest_api_id = aws_api_gateway_rest_api.wildrydes_api.id
   resource_id = aws_api_gateway_resource.rideresource.id
   http_method = aws_api_gateway_method.ride_post_method.http_method
   status_code = "200"
-   response_models = {
+  response_models = {
     "application/json" = "Empty"
   }
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = true
+    "method.response.header.Access-Control-Allow-Methods" = true
+    "method.response.header.Access-Control-Allow-Origin"  = true
+  }
 }
+
+resource "aws_api_gateway_integration_response" "options" {
+  rest_api_id = aws_api_gateway_rest_api.wildrydes_api.id
+  resource_id = aws_api_gateway_resource.rideresource.id
+  http_method = aws_api_gateway_integration.lambda_integration.http_method
+  status_code = "200"
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+    "method.response.header.Access-Control-Allow-Methods" = "'POST,OPTIONS'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+  }
+}
+
+
+
+
+
+# resource "aws_api_gateway_method_settings" "ride_method_settings" {
+#   rest_api_id = aws_api_gateway_rest_api.wildrydes_api.id
+#   stage_name  = "prod"
+#   method_path = aws_api_gateway_resource.rideresource.path_part
+ 
+# #   settings {
+# #     authorization_type = "COGNITO_USER_POOLS"
+# #     authorizer_id      = aws_api_gateway_authorizer.wildrydes_authorizer.id
+# #   }
+# }
+
+# resource "aws_api_gateway_method_response" "method_response" {
+#   rest_api_id = aws_api_gateway_rest_api.wildrydes_api.id
+#   resource_id = aws_api_gateway_resource.rideresource.id
+#   http_method = aws_api_gateway_method.ride_post_method.http_method
+#   status_code = "200"
+#    response_models = {
+#     "application/json" = "Empty"
+#   }
+# }
+
+# resource "aws_api_gateway_gateway_response" "cors" {
+#   rest_api_id = aws_api_gateway_rest_api.wildrydes_api.id
+#   response_type = "DEFAULT_4XX"
+
+#   response_parameters = {
+#     "gatewayresponse.header.Access-Control-Allow-Origin" = "'*'"
+#     "gatewayresponse.header.Access-Control-Allow-Methods" = "'POST,OPTIONS'"
+#     "gatewayresponse.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+#   }
+# }
+
