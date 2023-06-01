@@ -4,7 +4,7 @@ provider "aws" {
   region = "us-east-1"  # Replace with your desired region
 }
 
-resource "aws_cognito_user_pool" "example_user_pool" {
+resource "aws_cognito_user_pool" "cognito_user_pool" {
   name = "WildRydes"  # Replace with your desired user pool name
 
   username_attributes = ["email"]
@@ -24,32 +24,24 @@ resource "aws_cognito_user_pool" "example_user_pool" {
   } */
 }
 
-resource "aws_cognito_user_pool_client" "example_user_pool_client" {
+resource "aws_cognito_user_pool_client" "user_pool_client" {
   name                   = "WildRydesWebApp"  # Replace with your desired client name
-  user_pool_id           = aws_cognito_user_pool.example_user_pool.id
+  user_pool_id           = var.cognito_user_pool
 /*   generate_secret        = false
   allowed_oauth_flows    = ["code"]
   allowed_oauth_scopes   = ["openid", "email"]
   allowed_oauth_flows_user_pool_client = true */
 }
 
-output "user_pool_id" {
-  value = aws_cognito_user_pool.example_user_pool.id
-}
-
-output "user_pool_client_id" {
-  value = aws_cognito_user_pool_client.example_user_pool_client.id
-}
-
-resource "aws_ses_email_identity" "example" {
+resource "aws_ses_email_identity" "email_identity" {
   email = "rizwan.farooq@andigital.com"
 }
 
-resource "aws_ses_domain_mail_from" "example" {
-  domain           = aws_ses_email_identity.example.email
-  mail_from_domain = "bounce.${aws_ses_domain_identity.example.domain}"
+resource "aws_ses_domain_mail_from" "domain_mail_from" {
+  domain           = aws_ses_email_identity.email_identity.email
+  mail_from_domain = "bounce.${aws_ses_domain_identity.domain_identity.domain}"
 }
 
-resource "aws_ses_domain_identity" "example" {
+resource "aws_ses_domain_identity" "domain_identity" {
   domain = "andigital.com"
 }
