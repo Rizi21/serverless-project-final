@@ -21,7 +21,7 @@ resource "aws_amplify_branch" "master" {
   enable_pull_request_preview = true
   enable_auto_build = true
 
-    rewrite {
+    custom_rule {
     source = "/wild-ryde-app/html/(.*)"
     target = "/$1"
   }
