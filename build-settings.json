@@ -1,8 +1,0 @@
-{
-  "frontend": {
-    "build": {
-      "command": "yarn build",
-      "output": "deploy"
-    }
-  }
-}
