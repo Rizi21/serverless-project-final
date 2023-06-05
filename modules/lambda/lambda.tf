@@ -1,3 +1,7 @@
+provider "aws" {
+  region = "us-east-1"  
+}
+
 resource "aws_iam_role" "wild_rydes_lambda_role" {
   name               = "WildRydesLambda"
   assume_role_policy = <<EOF
@@ -15,6 +19,41 @@ resource "aws_iam_role" "wild_rydes_lambda_role" {
   ]
 }
 EOF
+}
+
+resource "aws_iam_policy" "s3_read_unzip_policy" {
+  name        = "S3ReadUnzipPolicy"
+  description = "Allows Lambda function to read and unzip files from S3"
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowS3Read",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Resource": "arn:aws:s3:::wildrydes123/*"
+    },
+    {
+      "Sid": "AllowUnzip",
+      "Effect": "Allow",
+      "Action": [
+        "lambda:CreateEventSourceMapping",
+        "lambda:ListEventSourceMappings"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "s3_read_unzip_attachment" {
+  role       = aws_iam_role.wild_rydes_lambda_role.name
+  policy_arn = aws_iam_policy.s3_read_unzip_policy.arn
 }
 
 resource "aws_iam_policy" "wild_rydes_lambda_cloudwatch_logs_policy" {
@@ -52,8 +91,7 @@ resource "aws_iam_policy" "wild_rydes_lambda_dynamodb_policy" {
       "Sid": "DynamoDBWriteAccess",
       "Effect": "Allow",
       "Action": "dynamodb:PutItem",
-      "Resource": "arn:aws:dynamodb:${var.aws_region}:${var.aws_account_id}:table/${var.dynamodb_table_name}"
-    }
+      "Resource": "arn:aws:dynamodb:us-east-1:323040907683:table/Rides"     }
   ]
 }
 EOF
@@ -69,23 +107,16 @@ resource "aws_iam_role_policy_attachment" "wild_rydes_lambda_dynamodb_attachment
   policy_arn = aws_iam_policy.wild_rydes_lambda_dynamodb_policy.arn
 }
 
-# Lambda Function
 resource "aws_lambda_function" "example_lambda" {
   function_name = "RequestUnicorn"
   handler       = "index.handler"
   runtime       = "nodejs16.x"
-  timeout       = 10
+  timeout       = 3
 
-  # IAM role for the Lambda function
-  role          = aws_iam_role.lambda_execution_role.arn
+  s3_bucket       = "wildrydes123"  # Name of your S3 bucket
+  s3_key          = "index.js.zip"  # Path to your .js file in the S3 bucket
 
-  # The Lambda function code
-  filename      = "index.js"
-  source_code_hash = filebase64sha256("index.js")
+  role          = aws_iam_role.wild_rydes_lambda_role.arn   # IAM role for the Lambda function
 
-  environment {
-    variables = {
-      TABLE_NAME = aws_dynamodb_table.rides_table.name
-    }
-  }
 }
+  
