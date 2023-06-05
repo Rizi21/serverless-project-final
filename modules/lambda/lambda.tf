@@ -107,29 +107,16 @@ resource "aws_iam_role_policy_attachment" "wild_rydes_lambda_dynamodb_attachment
   policy_arn = aws_iam_policy.wild_rydes_lambda_dynamodb_policy.arn
 }
 
-# Lambda Function
 resource "aws_lambda_function" "example_lambda" {
   function_name = "RequestUnicorn"
-  handler       = "example_lambda.js"
+  handler       = "index.handler"
   runtime       = "nodejs16.x"
-  timeout       = 10
+  timeout       = 3
 
-  s3_bucket       = "wildrydes123"  # Replace with the name of your S3 bucket
-  s3_key          = "requestUnicorn.js.zip"  # Replace with the path to your .js file in the S3 bucket
+  s3_bucket       = "wildrydes123"  # Name of your S3 bucket
+  s3_key          = "index.js.zip"  # Path to your .js file in the S3 bucket
 
+  role          = aws_iam_role.wild_rydes_lambda_role.arn   # IAM role for the Lambda function
 
-
-  # IAM role for the Lambda function
-  role          = aws_iam_role.wild_rydes_lambda_role.arn
-
-  # The Lambda function code
-/*   filename      = "index.js"
-  source_code_hash = filebase64sha256("index.js")
-
-  environment {
-    variables = {
-      TABLE_NAME = aws_dynamodb_table.rides_table.name
-    }
-  } */
 }
-
+  
