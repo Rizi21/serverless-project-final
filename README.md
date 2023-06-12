@@ -67,6 +67,6 @@ If you run the commands above for each AWS services folder found at the top leve
 
 ## Authors
 
-- [@Rizi21](https://www.github.com/octokatherine)
+- [@Rizi21](https://github.com/Rizi21))
 - [@abdullahbajwa1](https://github.com/abdullahbajwa1)
 - [@M-Ryhan-W](https://github.com/M-Ryhan-W)
