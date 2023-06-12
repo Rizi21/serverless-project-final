@@ -46,7 +46,9 @@ Once you have set up your access token, run the following commands from the top 
   Terraform init
   Terraform plan
   Terraform apply $REF Your access token variable file
+  Terraform destroy $REF Your access token variable file
 ```
+***Please remember to destroy all resources once complete!***
 
 If you run the commands above for each AWS services folder found at the top level, this will create all the services within a few minutes and the App will be live and hosted on AWS Amplify.
     
