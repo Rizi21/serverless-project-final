@@ -29,7 +29,8 @@ _JavaScript executed in the browser sends and receives data from a public backen
 
 ## Screenshots
 
-![image](https://github.com/Rizi21/serverless-project-final/assets/93591225/75986c46-a779-4e7c-a3b7-7a0cc00cbd5a)
+![image](https://github.com/Rizi21/serverless-project-final/assets/93591225/894315c4-4460-4186-a55e-3ab32599abd1)
+
 
 
 ## Installation
